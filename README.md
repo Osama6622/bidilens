@@ -1,101 +1,70 @@
-# BidiLens — Bidirectional CSS & Sass Logical Property Ecosystem
+# BidiLens
 
-> **See and enforce your CSS in both directions.** A TypeScript monorepo decoupling a shared CSS/Sass logical property auditing & rewriting engine (`@bidilens/core`) across three developer tools: a **Vue 3 Live LTR/RTL Workbench**, a **VS Code / Cursor Extension**, and a **Vite Build Plugin**.
+**See and enforce your CSS in both directions (LTR & RTL).**
 
----
-
-## Monorepo Architecture
-
-```mermaid
-flowchart TD
-  Core["@bidilens/core\n(Pure TS · Dart Sass · AST-free Offset Scanner · Logical Rewriter)"]
-  Web["packages/web (@bidilens/web)\nVue 3 + Vite + CodeMirror 6\nSide-by-Side LTR/RTL Studio"]
-  VSCode["packages/vscode (bidilens-vscode)\nVS Code & Cursor Extension\nReal-time Squiggles + Cmd+. Quick Fixes"]
-  Plugin["packages/vite-plugin (vite-plugin-bidilens)\nVite Transform Hook\nDev Warnings + CI Regression Gate"]
-
-  Core --> Web
-  Core --> VSCode
-  Core --> Plugin
-  Plugin -. "dogfooded in vite.config.ts" .-> Web
-```
-
-```text
-bidilens/
-├── packages/
-│   ├── core/          # @bidilens/core — Pure TS Sass compiler, scanner, logical fixer & Markdown reporter
-│   ├── web/           # @bidilens/web — Vue 3 (<script setup>) + Vite live LTR/RTL workbench
-│   ├── vscode/        # bidilens-vscode — VS Code / Cursor diagnostics + CodeAction Quick Fixes
-│   └── vite-plugin/   # vite-plugin-bidilens — Dev-server warnings & CI build gate
-├── .vscode/
-│   ├── launch.json    # One-key F5 Extension Development Host launcher
-│   └── tasks.json     # Pre-launch build task for @bidilens/core + bidilens-vscode
-└── docs/adr/          # Architecture Decision Records (001, 002, 003)
-```
+BidiLens detects hardcoded physical CSS properties (`margin-left`, `padding-right`, `left`, `right`, `border-left`, `text-align: left`, directional `border-radius`, and asymmetric 4-value shorthands) and converts them to CSS Logical Properties—across the browser, your editor, and your Vite build.
 
 ---
 
-## Supported Physical → Logical Mappings (`@bidilens/core`)
+## 1. Web Workbench (Live LTR / RTL Studio)
 
-| Category | Physical CSS | Logical CSS Replacement |
-| :--- | :--- | :--- |
-| **Box Model** | `margin-left/right`, `padding-left/right`, `border-left/right` (+ `-width`/`-style`/`-color`) | `*-inline-start` / `*-inline-end` |
-| **Positioning** | `left` / `right` | `inset-inline-start` / `inset-inline-end` |
-| **Alignment & Float** | `text-align: left/right`, `float: left/right`, `clear: left/right` | `start/end`, `inline-start/inline-end` |
-| **Corner Radii** | `border-top-left-radius`, `border-top-right-radius`, `border-bottom-left-radius`, `border-bottom-right-radius` | `border-start-start-radius`, `border-start-end-radius`, `border-end-start-radius`, `border-end-end-radius` |
-| **Asymmetric Shorthands** | `margin` / `padding` / `inset` / `border-*` `T R B L` (when `R !== L`), asymmetric `border-radius` | `*-block: T B` + `*-inline: L R` / logical corner radii |
+Use BidiLens directly in your browser—no installation required.
+
+1. Open the deployed **BidiLens Web Workbench**.
+2. Paste your component's **HTML** and **`.scss` / `.sass`** styles (or click one of the 4 built-in **Sample Fixtures** to test immediately).
+3. Inspect the synchronized side-by-side **`dir="ltr"`** and **`dir="rtl"`** previews:
+   - Switch between **Original CSS** and **Logical-Fixed Preview** to compare layouts live.
+   - Toggle **Bounding Grid** to spot spacing or alignment collisions.
+   - Test responsive breakpoints with **Mobile `375px`**, **Tablet `768px`**, and **Desktop `100%`**.
+4. Fix issues individually (**Fix Issue**) or rewrite the entire stylesheet in one step (**Auto-Fix All**), then click **Copy Fixed Output** or **Export Report (`.md`)**.
+
+**Keyboard Shortcuts**
+- `Cmd + Enter` / `Ctrl + Enter` — Compile Sass & run audit
+- `Cmd + Shift + F` / `Ctrl + Shift + F` — Auto-fix all physical CSS to logical CSS
 
 ---
 
-## Install & Use (Zero Clone Required)
+## 2. VS Code & Cursor Extension
 
-Once published via the included release workflows (`.github/workflows/deploy-pages.yml` & `.github/workflows/release.yml`), developers can use BidiLens directly without cloning this repository:
+Get real-time warning squiggles and one-click Quick Fixes in `.css`, `.scss`, `.sass`, and `.vue` `<style>` blocks.
 
-- **Web Workbench:** Open the deployed URL on **GitHub Pages**, **Vercel** (`vercel.json`), or **Netlify** (`netlify.toml`) directly in any browser.
-- **VS Code / Cursor Extension:** Search **"BidiLens"** in the VS Code Marketplace or Open VSX Registry (Cursor/Windsurf), or download `bidilens-vscode.vsix` from **GitHub Releases** and install via `code --install-extension bidilens-vscode.vsix`.
-- **Vite Build Plugin:**
+### Install
+- **VS Code / Cursor Marketplace:** Search for **BidiLens** in the Extensions panel and click **Install**.
+- **From `.vsix` (GitHub Releases):**
   ```bash
-  npm install -D vite-plugin-bidilens
-  ```
-- **Programmatic Core Engine:**
-  ```bash
-  npm install @bidilens/core
+  code --install-extension bidilens-vscode.vsix
+  # or in Cursor:
+  cursor --install-extension bidilens-vscode.vsix
   ```
 
-### Publishing Your First Public Release
-1. Push to GitHub `main` and enable **Settings → Pages → Source: GitHub Actions** to auto-deploy the Web Workbench (or import the repo in Vercel / Netlify).
-2. Add optional repository secrets (`NPM_TOKEN`, `VSCE_PAT`, `OVSX_PAT`) in **GitHub Settings → Secrets → Actions**.
-3. Push a version tag to publish to npm, VS Code Marketplace, Open VSX, and GitHub Releases automatically:
-   ```bash
-   git tag v1.0.0 && git push --tags
-   ```
+### Use
+1. Open any `.css`, `.scss`, `.sass`, or `.vue` file. Physical directional rules are underlined automatically.
+2. Place your cursor on a warning and press **`Cmd + .`** (macOS) or **`Ctrl + .`** (Windows/Linux):
+   - **Convert to logical CSS property** — fixes the current line.
+   - **Fix all physical CSS in file** — converts every physical rule in the file at once.
+3. You can also run **`BidiLens: Fix All Physical CSS in File`** from the Command Palette (`Cmd/Ctrl + Shift + P`).
+
+### Optional Settings
+```json
+{
+  "bidilens.enable": true,
+  "bidilens.severity": "Warning" // "Warning" | "Information" | "Error"
+}
+```
 
 ---
 
-## Local Development Quick Start
+## 3. Vite Plugin (`vite-plugin-bidilens`)
 
-### 1. Install & Build All Workspace Packages
+Catch physical CSS regressions automatically during `vite dev` and fail CI builds on `vite build`.
+
+### Install
 ```bash
-npm install
-npm run build
+npm install -D vite-plugin-bidilens
 ```
 
-### 2. Run the Web Workbench (`packages/web`)
-```bash
-npm run dev
-```
-- **Features:** Split CodeMirror 6 HTML + `.scss`/`.sass` editors, 4 one-click **Sample Fixtures**, dual `<iframe sandbox="">` LTR/RTL live preview, viewport presets (`375px`, `768px`, `100%`), **Bounding Grid** overlay, **Original vs. Logical-Fixed** stream switch, `localStorage` persistence, and workbench **UI: LTR ⇄ RTL** toggle.
-- **Shortcuts:** `Cmd/Ctrl + Enter` (Compile & Audit), `Cmd/Ctrl + Shift + F` (Auto-Fix All).
-
-### 3. Debug the VS Code / Cursor Extension (`packages/vscode`)
-1. Open this repository root in **VS Code** or **Cursor**.
-2. Press **`F5`** (uses [.vscode/launch.json](./.vscode/launch.json) to compile `@bidilens/core` + `bidilens-vscode` and launch the **Extension Development Host**).
-3. Open any `.css`, `.scss`, `.sass`, or `.vue` file containing physical properties (e.g., `margin-left: 16px;`) to inspect live warning squiggles and press **`Cmd+.` / `Ctrl+.`** for:
-   - **"Convert to logical CSS property"** (single rule)
-   - **"Fix all physical CSS in file"** (entire stylesheet or Vue `<style>` block)
-
-### 4. Configure the Vite Build Plugin (`packages/vite-plugin`)
+### Configure (`vite.config.ts`)
 ```ts
-// vite.config.ts
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { bidilensPlugin } from 'vite-plugin-bidilens';
@@ -103,7 +72,7 @@ import { bidilensPlugin } from 'vite-plugin-bidilens';
 export default defineConfig({
   plugins: [
     bidilensPlugin({
-      failOnError: process.env.CI === 'true',
+      failOnError: process.env.CI === 'true', // Warn in dev, fail in CI
       include: ['src/**/*.{css,scss,sass,vue}'],
       exclude: ['**/node_modules/**', '**/legacy/**'],
     }),
@@ -112,15 +81,47 @@ export default defineConfig({
 });
 ```
 
-### 5. Run the Monorepo Test & Type-Check Suite
+---
+
+## 4. Programmatic API (`@bidilens/core`)
+
+Use the pure TypeScript engine directly in custom scripts, linters, or CI tools.
+
+### Install
 ```bash
-npm test          # Runs Vitest across core, web, vscode, and vite-plugin
-npm run typecheck # Runs TypeScript project references (tsc -b)
+npm install @bidilens/core
+```
+
+### Usage
+```ts
+import { auditStylesheet, applyAllFixes, generateMarkdownReport } from '@bidilens/core';
+
+const scss = `
+.card {
+  margin-left: 16px;
+  padding: 12px 16px 12px 24px;
+  text-align: left;
+}
+`;
+
+const result = auditStylesheet(scss, 'scss');
+console.log(result.summary.bidiScore); // Bidi readiness percentage
+console.log(result.diagnostics);       // Line/column spans & logical suggestions
+
+const fixedScss = applyAllFixes(scss, 'scss');
+const markdown = generateMarkdownReport(result);
 ```
 
 ---
 
-## Architecture Decision Records
-- [ADR 001: Shared-Core TypeScript Monorepo Architecture](./docs/adr/001-shared-core-monorepo-architecture.md)
-- [ADR 002: Browser-Compatible Dart Sass Compilation & Offset-Preserving Logical Rewriter](./docs/adr/002-sass-compilation-and-logical-rewriter.md)
-- [ADR 003: Sandboxed Dual-Iframe LTR/RTL Live Preview](./docs/adr/003-sandboxed-iframe-preview.md)
+## Supported Physical → Logical Mappings
+
+| Category | Physical CSS | Logical CSS |
+| :--- | :--- | :--- |
+| **Box Model** | `margin-left` / `margin-right` | `margin-inline-start` / `margin-inline-end` |
+| **Box Model** | `padding-left` / `padding-right` | `padding-inline-start` / `padding-inline-end` |
+| **Box Model** | `border-left` / `border-right` (+ `-width` / `-style` / `-color`) | `border-inline-start` / `border-inline-end` (+ sub-properties) |
+| **Positioning** | `left` / `right` | `inset-inline-start` / `inset-inline-end` |
+| **Alignment & Float** | `text-align: left/right`, `float: left/right`, `clear: left/right` | `start/end`, `inline-start/inline-end` |
+| **Corner Radii** | `border-top-left-radius`, `border-top-right-radius`, `border-bottom-left-radius`, `border-bottom-right-radius` | `border-start-start-radius`, `border-start-end-radius`, `border-end-start-radius`, `border-end-end-radius` |
+| **Asymmetric Shorthands** | 4-value `margin` / `padding` / `inset` / `border-*` (`right !== left`), asymmetric `border-radius` | `*-block` + `*-inline` / logical corner radii |
