@@ -9,4 +9,24 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    chunkSizeWarningLimit: 4200,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-vue': ['vue'],
+          'vendor-sass': ['sass'],
+          'vendor-codemirror': [
+            '@codemirror/state',
+            '@codemirror/view',
+            '@codemirror/commands',
+            '@codemirror/language',
+            '@codemirror/lang-html',
+            '@codemirror/lang-sass',
+            '@lezer/highlight',
+          ],
+        },
+      },
+    },
+  },
 });

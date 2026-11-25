@@ -342,7 +342,7 @@ export const SAMPLE_FIXTURES: SampleFixture[] = [
   {
     id: 'broken-navbar',
     name: 'Broken Navbar',
-    badge: '7 physical rules',
+    badge: '9 physical rules',
     description:
       'Navigation bar with physical margin-left: auto, border-left divider, and right-anchored unread badge.',
     html: `<nav class="bidi-nav">
