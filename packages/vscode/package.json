@@ -1,0 +1,74 @@
+{
+  "name": "bidilens-vscode",
+  "displayName": "BidiLens — Logical CSS & RTL Linter",
+  "description": "Real-time editor squiggles and one-click Quick Fixes to convert physical CSS/SCSS/Sass/Vue styles into CSS Logical Properties.",
+  "version": "1.0.0",
+  "publisher": "bidilens",
+  "license": "MIT",
+  "keywords": [
+    "rtl",
+    "ltr",
+    "bidi",
+    "logical-properties",
+    "css",
+    "scss",
+    "sass",
+    "vue",
+    "linter"
+  ],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:css",
+    "onLanguage:scss",
+    "onLanguage:sass",
+    "onLanguage:vue"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "bidilens.fixAllInActiveEditor",
+        "title": "BidiLens: Fix All Physical CSS in File"
+      }
+    ],
+    "configuration": {
+      "title": "BidiLens",
+      "properties": {
+        "bidilens.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable real-time BidiLens physical CSS diagnostics in CSS, SCSS, Sass, and Vue files."
+        },
+        "bidilens.severity": {
+          "type": "string",
+          "enum": [
+            "Warning",
+            "Information",
+            "Error"
+          ],
+          "default": "Warning",
+          "description": "Diagnostic severity shown for physical directional CSS rules."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -b && node scripts/bundle.mjs",
+    "watch": "node scripts/bundle.mjs --watch",
+    "package:vsix": "npm run build && npx --yes @vscode/vsce package --no-dependencies -o bidilens-vscode.vsix",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@bidilens/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "@types/vscode": "^1.96.0"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "./src",
+    "outDir": "./out-tsc",
+    "types": ["node", "vscode"]
+  },
+  "references": [
+    { "path": "../core" }
+  ],
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/__tests__/**", "src/**/*.spec.ts", "dist", "out-tsc"]
+}

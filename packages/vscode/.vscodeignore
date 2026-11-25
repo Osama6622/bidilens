@@ -1,0 +1,8 @@
+src/**
+out-tsc/**
+scripts/**
+tsconfig.json
+*.tsbuildinfo
+*.vsix
+**/*.spec.ts
+node_modules/**

@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build:core && npm run build:plugin && npm run build:web"
+  publish = "packages/web/dist"
+
+[build.environment]
+  NODE_VERSION = "22"

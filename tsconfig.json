@@ -1,7 +1,10 @@
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+    { "path": "./packages/core" },
+    { "path": "./packages/vite-plugin" },
+    { "path": "./packages/vscode" },
+    { "path": "./packages/web/tsconfig.app.json" },
+    { "path": "./packages/web/tsconfig.node.json" }
   ]
 }

@@ -1,0 +1,33 @@
+{
+  "name": "@bidilens/web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BidiLens Web Workbench — Live side-by-side LTR/RTL visual studio powered by @bidilens/core.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@bidilens/core": "*",
+    "@codemirror/commands": "^6.8.0",
+    "@codemirror/lang-html": "^6.4.9",
+    "@codemirror/lang-sass": "^6.0.2",
+    "@codemirror/language": "^6.10.8",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.36.5",
+    "@lezer/highlight": "^1.2.1",
+    "sass": "^1.85.1",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/test-utils": "^2.4.6",
+    "typescript": "~5.7.3",
+    "vite": "^6.2.0",
+    "vite-plugin-bidilens": "*",
+    "vue-tsc": "^2.2.4"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "noEmit": true,
+    "types": ["node"],
+    "paths": {
+      "vite-plugin-bidilens": ["../vite-plugin/src/index.ts"]
+    }
+  },
+  "references": [
+    { "path": "../vite-plugin" }
+  ],
+  "include": ["vite.config.ts"]
+}

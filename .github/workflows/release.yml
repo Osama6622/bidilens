@@ -1,0 +1,52 @@
+name: Publish Release (npm + VS Code / Cursor Extension)
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm test
+
+      - name: Publish @bidilens/core & vite-plugin-bidilens to npm
+        if: ${{ secrets.NPM_TOKEN != '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm publish --workspace=@bidilens/core --access public
+          npm publish --workspace=vite-plugin-bidilens --access public
+
+      - name: Package VS Code / Cursor .vsix
+        run: npm run package:vsix --workspace=bidilens-vscode
+
+      - name: Publish to VS Code Marketplace
+        if: ${{ secrets.VSCE_PAT != '' }}
+        working-directory: packages/vscode
+        run: npx --yes @vscode/vsce publish --no-dependencies -p ${{ secrets.VSCE_PAT }}
+
+      - name: Publish to Open VSX Registry (Cursor / Windsurf)
+        if: ${{ secrets.OVSX_PAT != '' }}
+        working-directory: packages/vscode
+        run: npx --yes ovsx publish bidilens-vscode.vsix -p ${{ secrets.OVSX_PAT }}
+
+      - name: Attach .vsix to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packages/vscode/bidilens-vscode.vsix
+          generate_release_notes: true

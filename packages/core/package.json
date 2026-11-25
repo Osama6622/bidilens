@@ -1,0 +1,43 @@
+{
+  "name": "@bidilens/core",
+  "version": "1.0.0",
+  "description": "Pure TypeScript CSS/SCSS/Sass compiler wrapper and physical-to-logical property auditing & rewriting engine.",
+  "license": "MIT",
+  "keywords": [
+    "css",
+    "sass",
+    "scss",
+    "rtl",
+    "ltr",
+    "bidi",
+    "logical-properties",
+    "i18n",
+    "linter"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "prepublishOnly": "npm run build",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "sass": "^1.85.1"
+  }
+}
