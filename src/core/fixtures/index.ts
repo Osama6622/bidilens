@@ -1,5 +1,11 @@
 import { scssToIndentedSass } from '../auditor/syntaxConverter';
+import { auditStylesheet } from '../auditor/transformer';
 import type { SampleFixture } from '../auditor/types';
+
+function formatFixtureBadge(scss: string): string {
+  const count = auditStylesheet(scss, 'scss').summary.totalIssues;
+  return count === 0 ? '0 issues · 100% Bidi' : `${count} physical rules`;
+}
 
 const brokenNavbarScss = `$surface: #ffffff;
 $border: #e2e8f0;
@@ -342,7 +348,7 @@ export const SAMPLE_FIXTURES: SampleFixture[] = [
   {
     id: 'broken-navbar',
     name: 'Broken Navbar',
-    badge: '9 physical rules',
+    badge: formatFixtureBadge(brokenNavbarScss),
     description:
       'Navigation bar with physical margin-left: auto, border-left divider, and right-anchored unread badge.',
     html: `<nav class="bidi-nav">
@@ -369,7 +375,7 @@ export const SAMPLE_FIXTURES: SampleFixture[] = [
   {
     id: 'icon-input-form',
     name: 'Form with Icon Inputs',
-    badge: '11 physical rules',
+    badge: formatFixtureBadge(iconInputFormScss),
     description:
       'Input fields with absolute left icons, asymmetric padding, left callout border, and right-floated submit button.',
     html: `<form class="auth-card" onsubmit="return false;">
@@ -402,7 +408,7 @@ export const SAMPLE_FIXTURES: SampleFixture[] = [
   {
     id: 'directional-card',
     name: 'Card with Directional Offsets/Borders',
-    badge: '13 physical rules',
+    badge: formatFixtureBadge(directionalCardScss),
     description:
       'Release card combining 4-value padding shorthand, physical corner radii, border-left accent, and top-right ribbon.',
     html: `<article class="release-card">
@@ -423,7 +429,7 @@ export const SAMPLE_FIXTURES: SampleFixture[] = [
   {
     id: 'clean-logical',
     name: 'Clean Logical Component',
-    badge: '0 issues · 100% Bidi',
+    badge: formatFixtureBadge(cleanLogicalScss),
     description:
       'Reference component authored entirely with CSS Logical Properties — renders natively in both LTR and RTL.',
     html: `<section class="logical-banner">
